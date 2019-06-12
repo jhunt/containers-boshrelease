@@ -24,5 +24,8 @@ export TMPDIR=/var/vcap/data/tmp
 exec /var/vcap/packages/docker/bin/docker-compose-real "$@"
 EOF
 
+# ttar: included in src/ttar
+cp ttar/ttar ${BOSH_INSTALL_TARGET}/bin/ttar
+
 
 chmod 0755 ${BOSH_INSTALL_TARGET}/bin/*

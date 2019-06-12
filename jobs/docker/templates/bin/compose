@@ -46,6 +46,7 @@ case $1 in
       exit 1
     fi
 
+    ttar < $JOB_DIR/etc/files.ttar
     cd $JOB_DIR/etc/running
     exec docker-compose up --remove-orphans
     ;;

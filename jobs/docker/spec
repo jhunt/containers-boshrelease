@@ -6,6 +6,7 @@ templates:
   bin/compose: bin/compose
   envrc:       envrc
 
+  etc/files.ttar:                 etc/files.ttar
   etc/running/docker-compose.yml: etc/running/docker-compose.yml
 
 packages:
@@ -15,3 +16,10 @@ properties:
   recipe:
     description: |
       The full docker-compose recipe to run, via `docker-compose up -d'.
+
+  files:
+    description: |
+      A map, keyed by relative file path, of additional files to create
+      and use in bind mounts of the docker-compose recipe.
+
+# vim:ft=yaml

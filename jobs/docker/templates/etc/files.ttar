@@ -1,0 +1,3 @@
+<% p('files', {}).each do |name, contents| %>====== 0644 /var/vcap/jobs/docker/etc/running/<%= name %>
+<%= contents %>
+<% end %>
