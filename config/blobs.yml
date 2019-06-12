@@ -1,0 +1,12 @@
+docker/docker-18.06.3-ce.tgz:
+  size: 43844133
+  object_id: 281e78eb-face-47f4-60c1-e9752ba32ecf
+  sha: 79a983a41275bd7a660a42935504f5c1ff7a5858
+docker/docker-compose:
+  size: 16350840
+  object_id: 84838191-4189-430f-4952-55fb5caa38e9
+  sha: 043fec968aab2059f48958ef037e7b983e03863d
+docker/git-2.20.1.tar.gz:
+  size: 7962304
+  object_id: d4ed5523-2380-4382-54a9-f9b6ddeeeba8
+  sha: 6439fb9afc9366f7bf1ddf8bfbe59998e0450ed3

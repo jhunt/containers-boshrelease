@@ -1,0 +1,17 @@
+---
+name: docker
+
+templates:
+  bin/docker:  bin/docker
+  bin/compose: bin/compose
+  envrc:       envrc
+
+  etc/running/docker-compose.yml: etc/running/docker-compose.yml
+
+packages:
+  - docker
+
+properties:
+  recipe:
+    description: |
+      The full docker-compose recipe to run, via `docker-compose up -d'.

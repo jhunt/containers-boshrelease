@@ -1,0 +1,2 @@
+export DOCKER_HOST=unix:///var/vcap/sys/run/docker/docker.sock
+export PATH=$PATH:/var/vcap/packages/docker/bin

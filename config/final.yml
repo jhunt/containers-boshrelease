@@ -1,0 +1,6 @@
+---
+final_name: containers
+blobstore:
+  provider: s3
+  options:
+    bucket_name: containers-boshrelease

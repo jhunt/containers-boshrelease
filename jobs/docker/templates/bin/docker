@@ -1,0 +1,87 @@
+#!/bin/bash
+set -eu
+
+JOB=docker
+BIN=docker
+SIGTERM_FOR=15
+SIGKILL_FOR=5
+
+RUN_DIR=/var/vcap/sys/run/docker
+LOG_DIR=/var/vcap/sys/log/docker
+DAT_DIR=/var/vcap/store/docker
+PIDFILE=${RUN_DIR}/docker.pid
+exec >>$LOG_DIR/docker.log 2>&1
+
+case $1 in
+  start)
+    echo "[$(date)] $BIN/$$: starting up..."
+    mkdir -p $RUN_DIR $LOG_DIR
+
+    echo "[$(date)] $BIN/$$: setting up /sys/fs/cgroup mounts..."
+    for sys in $(awk '!/^#/ { if ($4 == 1) print $1 }' /proc/cgroups); do
+      where=/sys/fs/cgroup/$sys
+      mkdir -p $where
+      if ! mountpoint -q $where; then
+        if ! mount -n -t cgroup -o $sys cgroup $where; then
+          rmdir $where || true
+        fi
+      fi
+    done
+
+    echo "[$(date)] $BIN/$$: executing dockerd (in the background)..."
+    export PATH="$PATH:/var/vcap/packages/docker/bin"
+    dockerd \
+      --pidfile $PIDFILE \
+      --group vcap \
+      --data-root $DAT_DIR \
+      --host unix://$RUN_DIR/docker.sock
+    ;;
+
+  stop)
+    echo "[$(date)] $BIN/$$: shutting down..."
+    if [[ -f $PIDFILE ]]; then
+      PID=$(head -1 $PIDFILE)
+      if [[ -n "$PID" ]]; then
+        if [[ -e /proc/$PID ]]; then
+          echo "[$(date)] $BIN/$$: found pid file $PIDFILE, with pid '$PID' (which is running)"
+          echo "[$(date)] $BIN/$$: sending SIGTERM for ${SIGTERM_FOR}s, followed by a SIGKILL..."
+          for i in $(seq 1 $(expr $SIGTERM_FOR \* 10)); do
+            kill -TERM $PID || true
+            if [[ ! -e /proc/$PID ]]; then
+              echo "[$(date)] $BIN/$$: pid $PID terminated (via SIGTERM)"
+              rm -f $PIDFILE
+              echo "[$(date)] $BIN/$$: shut down complete"
+              exit 0
+            fi
+            sleep 0.1
+          done
+
+          echo "[$(date)] $BIN/$$: pid $PID did not termiante (via SIGTERM) within ${SIGTERM_FOR}s; sending a SIGKILL and waiting ${SIGKILL_FOR}s..."
+          for i in $(seq 1 $(expr $SIGKILL_FOR \* 10)); do
+            kill -KILL $PID || true
+            if [[ ! -e /proc/$PID ]]; then
+              echo "[$(date)] $BIN/$$: pid $PID terminated (via SIGKILL)"
+              rm -f $PIDFILE
+              echo "[$(date)] $BIN/$$: shut down complete"
+              exit 0
+            fi
+            sleep 0.1
+          done
+          echo "[$(date)] $BIN/$$: pid $PID did not termiante (via SIGKILL) within ${SIGKILL_FOR}s; giving up."
+          exit 1
+        fi
+
+        echo "[$(date)] $BIN/$$: found (stale) pid file $PIDFILE, with pid '$PID' (which is defunct)"
+      fi
+      rm -f $PIDFILE
+    fi
+    echo "[$(date)] $BIN/$$: shut down complete"
+    exit 0
+    ;;
+
+  *)
+    echo "Usage: ctl {start|stop}"
+    exit 1
+    ;;
+esac
+exit 0

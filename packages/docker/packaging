@@ -1,0 +1,28 @@
+#!/bin/bash
+set -eu
+
+CPUS=$(grep -c ^processor /proc/cpuinfo)
+
+# docker: https://download.docker.com/linux/static/stable/x86_64/docker-18.06.3-ce.tgz
+tar -xzf docker/docker-18.06.3-ce.tgz
+mkdir -p ${BOSH_INSTALL_TARGET}/bin
+cp docker/* ${BOSH_INSTALL_TARGET}/bin
+
+# git: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.20.1.tar.gz
+tar -xzf docker/git-2.20.1.tar.gz
+pushd git-2.20.1 >/dev/null 2>&1
+./configure --prefix=${BOSH_INSTALL_TARGET}
+make -j$CPUS all
+make install
+popd >/dev/null 2>&1
+
+# docker-compose: https://github.com/docker/compose/releases/download/1.25.0-rc1/docker-compose-Linux-x86_64
+cp docker/docker-compose ${BOSH_INSTALL_TARGET}/bin/docker-compose-real
+cat >${BOSH_INSTALL_TARGET}/bin/docker-compose <<'EOF'
+#!/bin/sh
+export TMPDIR=/var/vcap/data/tmp
+exec /var/vcap/packages/docker/bin/docker-compose-real "$@"
+EOF
+
+
+chmod 0755 ${BOSH_INSTALL_TARGET}/bin/*
