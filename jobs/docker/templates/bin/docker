@@ -33,7 +33,7 @@ case $1 in
     dockerd \
       --pidfile $PIDFILE \
       --group vcap \
-      --data-root $DAT_DIR \
+      --data-root $DAT_DIR<% p('insecure-registries', []).each do |r| %> --insecure-registry "<%= r %>"<% end %> \
       --host unix://$RUN_DIR/docker.sock<% if_p('bind') do |port| %> --host tcp://0.0.0.0:<%= port %><% end %>
     ;;
 
