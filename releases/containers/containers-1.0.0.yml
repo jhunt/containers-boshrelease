@@ -1,0 +1,19 @@
+name: containers
+version: 1.0.0
+commit_hash: d034137
+uncommitted_changes: false
+jobs:
+- name: docker
+  version: 66e9aa14565b02fe240bd38b36bc1c4d1a9e09e6
+  fingerprint: 66e9aa14565b02fe240bd38b36bc1c4d1a9e09e6
+  sha1: 496c3f43d6d3d52ee82b6ba6e5bf7227b8088144
+packages:
+- name: docker
+  version: a6d148c119a3a1633214b1469d7f0c79c8fdf236
+  fingerprint: a6d148c119a3a1633214b1469d7f0c79c8fdf236
+  sha1: 5aa3d4e84e50cc09fc9c5ade8c417bbf0f3c6dce
+  dependencies: []
+license:
+  version: a3d552d4b1af921ea153aa929e1cf82d028492b6
+  fingerprint: a3d552d4b1af921ea153aa929e1cf82d028492b6
+  sha1: 414d0334eb610ad99db340df29f6c23aac9f4fe5
