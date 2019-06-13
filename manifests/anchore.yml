@@ -1,0 +1,108 @@
+---
+name: anchore
+
+stemcells:
+  - alias:   default
+    os:      ubuntu-xenial
+    version: latest
+
+releases:
+  - name:    containers
+    version: latest
+
+update:
+  canaries:          1
+  max_in_flight:     1
+  serial:            true
+  canary_watch_time: 1000-120000
+  update_watch_time: 1000-120000
+
+instance_groups:
+  - name: docker
+    instances: 1 
+    azs: [z1]
+    vm_type: default
+    stemcell: default
+    networks:
+      - name: default
+    persistent_disk: 8192
+
+    jobs:
+      - name: docker
+        release: containers
+        properties:
+          recipe:
+            version: "2.1"
+            volumes:
+              db: {external: false}
+              scratch: {}
+
+            services:
+              db:
+                image: postgres:9
+                environment:
+                  - POSTGRES_PASSWORD=LLhpoMbycv64q7PBTflur
+                expose: [5432]
+                volumes:
+                  - db:/var/lib/postgresql/data
+                logging: &logging
+                  driver: json-file
+                  options:
+                    max-size: 100m
+
+              analyzer:
+                depends_on: [db, catalog]
+                image: anchore/anchore-engine:v0.4.0
+                command: [anchore-manager, service, start, analyzer]
+                environment:
+                  - ANCHORE_ENDPOINT_HOSTNAME=analyzer
+                  - ANCHORE_DB_HOST=db
+                  - ANCHORE_DB_PASSWORD=LLhpoMbycv64q7PBTflur
+                expose: [8228]
+                volumes:
+                  - scratch:/analysis_scratch
+                logging: *logging
+
+              api:
+                depends_on: [db, catalog]
+                image: anchore/anchore-engine:v0.4.0
+                command: [anchore-manager, service, start, apiext]
+                environment:
+                  - ANCHORE_ENDPOINT_HOSTNAME=api
+                  - ANCHORE_DB_HOST=db
+                  - ANCHORE_DB_PASSWORD=LLhpoMbycv64q7PBTflur
+                ports: ['8228:8228']
+                logging: *logging
+
+              catalog:
+                depends_on: [db]
+                image: anchore/anchore-engine:v0.4.0
+                command: [anchore-manager, service, start, catalog]
+                environment:
+                  - ANCHORE_ENDPOINT_HOSTNAME=catalog
+                  - ANCHORE_DB_HOST=db
+                  - ANCHORE_DB_PASSWORD=LLhpoMbycv64q7PBTflur
+                expose: [8228]
+                logging: *logging
+
+              policy-engine:
+                depends_on: [db, catalog]
+                image: anchore/anchore-engine:v0.4.0
+                command: [anchore-manager, service, start, policy_engine]
+                environment:
+                  - ANCHORE_ENDPOINT_HOSTNAME=policy-engine
+                  - ANCHORE_DB_HOST=db
+                  - ANCHORE_DB_PASSWORD=LLhpoMbycv64q7PBTflur
+                expose: [8228]
+                logging: *logging
+
+              engine-simpleq:
+                depends_on: [db, catalog]
+                image: anchore/anchore-engine:v0.4.0
+                command: [anchore-manager, service, start, simplequeue]
+                environment:
+                  - ANCHORE_ENDPOINT_HOSTNAME=simpleq
+                  - ANCHORE_DB_HOST=db
+                  - ANCHORE_DB_PASSWORD=LLhpoMbycv64q7PBTflur
+                expose: [8228]
+                logging: *logging
