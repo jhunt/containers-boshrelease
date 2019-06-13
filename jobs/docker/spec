@@ -13,6 +13,22 @@ packages:
   - docker
 
 properties:
+  bind:
+    description: |
+      By default, the `docker` daemon is only bound to the local UNIX
+      domain socket (`unix:///var/vcap/sys/run/docker/docker.sock`).
+      However, there are circumstances where you may want or need to
+      interact with Docker from outside the BOSH VM, over a TCP link.
+
+      In those cases, you can set this to a TCP port number, and Docker
+      will also bind on that port, all interfaces, in addition to the
+      standard UNIX domain socket.
+
+      Be very careful about enabling this; Docker has zero authentication
+      and will gladly perform any action requested of it by anyone who
+      can connect to the (public) TCP port.  Make sure you are behind a
+      firewall, at the very least.
+
   recipe:
     description: |
       The full docker-compose recipe to run, via `docker-compose up -d'.

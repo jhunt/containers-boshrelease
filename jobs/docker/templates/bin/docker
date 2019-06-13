@@ -34,7 +34,7 @@ case $1 in
       --pidfile $PIDFILE \
       --group vcap \
       --data-root $DAT_DIR \
-      --host unix://$RUN_DIR/docker.sock
+      --host unix://$RUN_DIR/docker.sock<% if_p('bind') do |port| %> --host tcp://0.0.0.0:<%= port %><% end %>
     ;;
 
   stop)
