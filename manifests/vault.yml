@@ -1,0 +1,57 @@
+---
+name: vault
+stemcells:
+  - alias:   default
+    os:      ubuntu-xenial
+    version: latest
+
+releases:
+  - name:    containers
+    version: latest
+
+update:
+  canaries:          1
+  max_in_flight:     1
+  serial:            true
+  canary_watch_time: 1000-120000
+  update_watch_time: 1000-120000
+
+instance_groups:
+  - name:      docker
+    instances: 1 
+    azs:       [z1]
+    vm_type:   default
+    stemcell:  default
+    networks:  [{name: default}]
+
+    jobs:
+      - name: docker
+        release: containers
+        properties:
+          recipe:
+            version: '3'
+            services:
+              vault:
+                image: vault
+                ports: ['8200:8200']
+                environment:
+                  VAULT_API_ADDR: http://127.0.0.1:8200
+                  VAULT_LOCAL_CONFIG: >-
+                    {
+                      "disable_mlock": 1,
+                      "backend": {
+                        "file": {
+                          "path": "/vault/file"
+                        }
+                      },
+                      "listener": {
+                        "tcp": {
+                          "address":     "0.0.0.0:8200",
+                          "tls_disable": 1
+                        },
+                      },
+                      "default_lease_ttl": "168h",
+                      "max_lease_ttl": "720h"
+                    }
+                cap_add: [IPC_LOCK]
+                command: [vault, server, -config, /vault/config/local.json]
