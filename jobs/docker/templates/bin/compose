@@ -21,13 +21,6 @@ case $1 in
     echo "[$(date)] $BIN/$$: starting up..."
     mkdir -p $RUN_DIR $LOG_DIR
 
-    (shopt -s nullglob
-     for image in $(cat /var/vcap/jobs/*/docker-bosh-release-import/*.lst); do
-       echo "loading $image into docker..."
-       docker load <$image
-     done
-     docker images) 2>&1 | sed -e "s|^|[$(date)] $BIN/$$: |"
-
     echo "[$(date)] $BIN/$$: waiting for docker to become available..."
     n=300; ok=no
     while true; do
@@ -38,6 +31,13 @@ case $1 in
       n=$(( n - 1 ))
       sleep 0.1
     done
+
+    (shopt -s nullglob
+     for image in $(cat /var/vcap/jobs/*/docker-bosh-release-import/*.lst); do
+       echo "loading $image into docker..."
+       docker load <$image
+     done
+     docker images) 2>&1 | sed -e "s|^|[$(date)] $BIN/$$: |"
 
     echo $$ > $PIDFILE
     if [[ $ok == "no" ]]; then
