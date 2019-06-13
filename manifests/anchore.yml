@@ -31,6 +31,7 @@ instance_groups:
       - name: docker
         release: containers
         properties:
+          bind: 5001
           recipe:
             version: "2.1"
             volumes:
@@ -96,7 +97,7 @@ instance_groups:
                 expose: [8228]
                 logging: *logging
 
-              engine-simpleq:
+              simpleq:
                 depends_on: [db, catalog]
                 image: anchore/anchore-engine:v0.4.0
                 command: [anchore-manager, service, start, simplequeue]
