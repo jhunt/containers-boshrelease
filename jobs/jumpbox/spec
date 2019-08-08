@@ -1,0 +1,66 @@
+---
+name: jumpbox
+description: |
+  This job allows you to colocate local users who are immediately
+  dumped into a container running an image of their choice, with
+  their persistent home directories mounted.
+
+  This enables a jumpbox-like experience, without needing constant
+  redeploys to pick up new tools, updates, and environmental
+  customizations.
+
+templates:
+  bin/pre-start: bin/pre-start
+  bin/shell:     bin/shell
+
+properties:
+  users:
+    description: |
+      A list of local users, their SSH keys, and prefered images.
+      To specify more than one authorized key in the `key` property,
+      just make it a newline string, or a list.
+
+      The full list of supported keys (per user entry) is:
+
+        username       (required) The username for this user.
+
+        key            (required) The SSH authorized key for this user.
+
+        image                     The Docker image to spin up for this
+                                  user when they log in successfully.
+
+        home                      The path (in the container) to mount
+                                  this users home directory into.
+
+    example: |
+      users:
+        - username: jhunt
+          image:    'huntprod/jumpbox:jhunt'
+          key:       ssh-ed25519 AAAAC3NzaC1...JvthCmK jhunt@laptop
+
+  default.image:
+    default:     'huntprod/cf-jumpbox:latest'
+    description: |
+      The default image to use for users who do not have one listed
+      explicitly.  The Dockerfile for the _default_ default image
+      can be found in the `docker-boshrelease` GitHub repository,
+      under `jumpbox/`.
+
+  default.home:
+    default:     /home/(username)
+    description: |
+      The default path (in the container) where the users persistent
+      home directory will be mounted.  The string `(username)` will
+      be replaced by the actual username for the account.
+
+  homes:
+    default: /var/vcap/store/jumpbox/home
+    description: |
+      Where to store user home directories on the jumpbox/docker VM.
+      Each user gets a directory underneath this path, which gets
+      mounted into their container image every time they log in.
+
+      By default, these home directories are stored on persistent disk;
+      but if you need to move it, you can.  Note that BOSH will always
+      have a `store` directory, even if you don't provision a persistent
+      disk to mount it on.

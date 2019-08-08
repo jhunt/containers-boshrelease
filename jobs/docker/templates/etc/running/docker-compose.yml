@@ -1,1 +1,1 @@
-<%= p('recipe').to_yaml.to_s %>
+<%= p('recipe', {}).to_yaml.to_s %>
