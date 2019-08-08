@@ -1,0 +1,20 @@
+#!/bin/bash
+set -eu
+
+export PATH="$PATH:/var/vcap/packages/docker/bin"
+export DOCKER_HOST='unix:///var/vcap/sys/run/docker/docker.sock'
+
+HOMES="<%= p('homes') %>"
+case $USER in
+<% p('users').each do |user| %>
+<%= user['username'] %>)
+  docker pull "<%= user['image'] || p('default.image') %>"
+  exec docker run -it --rm -v $HOMES/$USER:<%= user['home'] || p('default.home') %> "<%= user['image'] || p('default.image') %>"
+  exit 1
+  ;;
+<% end %>
+
+*)
+  echo >&2 "session denied by jumpbox configuration."
+  exit 1;
+esac

@@ -1,0 +1,48 @@
+#!/bin/bash
+set -eu
+
+HOMES="<%= p('homes') %>"
+mkdir -p $HOMES
+
+<% p('users').each do |user|
+
+  username = user['username'] || ''
+  image    = user['image']    || p('default.image')
+  home     = user['home']     || p('default.home')
+
+  if username.empty?
+    raise "The 'username' field of each user entry is *required*."
+  end
+
+  if user['key'] && user['keys']
+    raise "User '#{username}' has both 'key' and 'keys' specified; choose one."
+  end
+
+  keys = user['key'] || user['keys'] || ''
+  if keys.empty?
+    raise "User '#{username}' has no SSH authorized keys specified."
+  end
+
+  if image.empty?
+    raise "User '#{username}' has no image specified, and default.image is not set."
+  end
+  if home.empty?
+    raise "User '#{username}' has no home directory specified, and default.home is not set."
+  end
+%>
+echo "[$(date)] pre-start/$$: setting up <%= username %>..."
+getent passwd <%= username %> > /dev/null || useradd --create-home <%= username %> --base-dir $HOMES
+passwd -d <%= username %>
+usermod -s /var/vcap/jobs/jumpbox/bin/shell <%= username %>
+usermod -G vcap,bosh_sshers <%= username %>
+
+chmod 0700 ~<%= username %>
+mkdir -p ~<%= username %>/.ssh
+touch ~<%= username %>/.ssh/authorized_keys
+chmod 0600 ~<%= username %>/.ssh/authorized_keys
+cat > ~<%= username %>/.ssh/authorized_keys <<EOF
+<%= [keys].flatten.join("\n") %>
+EOF
+chown -R <%= username %>: $HOMES/<%= username %>
+
+<% end %>
