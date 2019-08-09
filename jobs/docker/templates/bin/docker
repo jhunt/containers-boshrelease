@@ -12,14 +12,20 @@ DAT_DIR=/var/vcap/store/docker
 PIDFILE=${RUN_DIR}/docker.pid
 exec >>$LOG_DIR/docker.log 2>&1
 
+CGROUPS_ROOT=/sys/fs/cgroup
+if grep -q warden /var/vcap/bosh/etc/infrastructure; then
+  mkdir -p /cgroup
+  CGROUPS_ROOT=/cgroup
+fi
+
 case $1 in
   start)
     echo "[$(date)] $BIN/$$: starting up..."
     mkdir -p $RUN_DIR $LOG_DIR
 
-    echo "[$(date)] $BIN/$$: setting up /sys/fs/cgroup mounts..."
+    echo "[$(date)] $BIN/$$: setting up $CGROUPS_ROOT mounts..."
     for sys in $(awk '!/^#/ { if ($4 == 1) print $1 }' /proc/cgroups); do
-      where=/sys/fs/cgroup/$sys
+      where=$CGROUPS_ROOT/$sys
       mkdir -p $where
       if ! mountpoint -q $where; then
         if ! mount -n -t cgroup -o $sys cgroup $where; then
