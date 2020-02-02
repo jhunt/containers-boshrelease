@@ -9,6 +9,19 @@ templates:
   etc/files.ttar:                 etc/files.ttar
   etc/running/docker-compose.yml: etc/running/docker-compose.yml
 
+  bin/post-deploy: bin/post-deploy
+  etc/bootstrap:   etc/bootstrap
+  etc/ip:          etc/ip
+  etc/ips:         etc/ips
+
+provides:
+  - name: containers
+    type: docker-containers
+
+consumes:
+  - name: containers
+    type: docker-containers
+
 packages:
   - docker
 
@@ -32,6 +45,10 @@ properties:
   recipe:
     description: |
       The full docker-compose recipe to run, via `docker-compose up -d'.
+
+  post-deploy:
+    description: |
+      An executable script that will be run after the deployment.
 
   files:
     description: |

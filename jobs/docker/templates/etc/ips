@@ -1,0 +1,2 @@
+<% link('containers').instances.each do |instance| %><%= instance.address %>
+<% end %>

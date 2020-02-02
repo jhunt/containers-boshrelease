@@ -1,0 +1,66 @@
+---
+name: redis-cluster
+
+stemcells:
+  - alias:   default
+    os:      ubuntu-xenial
+    version: latest
+
+releases:
+  - name:    containers
+    version: latest
+
+update:
+  canaries:          1
+  max_in_flight:     1
+  serial:            true
+  canary_watch_time: 1000-120000
+  update_watch_time: 1000-120000
+
+instance_groups:
+  - name: docker
+    instances: 3
+    azs: [z1]
+    vm_type: default
+    stemcell: default
+    networks:
+      - name: default
+    persistent_disk: 8192
+
+    jobs:
+      - name: docker
+        release: containers
+        properties:
+          post-deploy: |
+            #!/bin/sh
+            echo hi stdout
+            echo >&2 hi stderr
+
+          recipe:
+            version: '3'
+            services:
+              redis:
+                image: redis
+                ports: ['6379:6379']
+                command:
+                  - redis-server
+                  - --protected-mode
+                  - 'no'
+                  - --cluster-enabled
+                  - 'yes'
+                  - --cluster-config-file
+                  - /tmp/state
+                  - --cluster-node-timeout
+                  - '5000'
+                  - --cluster-slave-validity-factor
+                  - '0'
+                  - --cluster-require-full-coverage
+                  - 'yes'
+                  - --appendonly
+                  - 'yes'
+                  - --appendfilename
+                  - redis.aof
+                  - --appendfsync
+                  - everysec
+                volumes:
+                  - '/var/vcap/store/redis/cluster/data:/data'

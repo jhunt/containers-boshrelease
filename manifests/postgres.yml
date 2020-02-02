@@ -1,0 +1,47 @@
+---
+name: postgres
+
+stemcells:
+  - alias:   default
+    os:      ubuntu-xenial
+    version: latest
+
+releases:
+  - name:    containers
+    version: latest
+
+update:
+  canaries:          1
+  max_in_flight:     1
+  serial:            true
+  canary_watch_time: 1000-120000
+  update_watch_time: 1000-120000
+
+instance_groups:
+  - name: docker
+    instances: 1
+    azs: [z1]
+    vm_type: default
+    stemcell: default
+    networks:
+      - name: default
+    persistent_disk: 8192
+
+    jobs:
+      - name: docker
+        release: containers
+        properties:
+          recipe:
+            version: '3'
+            services:
+              postgres:
+                image: postgres
+                ports: ['5432:5432']
+                volumes:
+                  - 'postgres-data:/var/lib/postgresql/data'
+                environment:
+                  POSTGRES_USER:     pguser
+                  POSTGRES_PASSWORD: sekrit
+                  POSTGRES_DB:       batadase
+            volumes:
+              postgres-data: ~

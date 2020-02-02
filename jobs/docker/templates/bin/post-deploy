@@ -1,0 +1,2 @@
+<% if p('post-deploy', nil) %><%= p('post-deploy') %><% else %>#!/bin/sh
+exit 0<% end %>
