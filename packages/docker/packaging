@@ -3,14 +3,14 @@ set -eu
 
 CPUS=$(grep -c ^processor /proc/cpuinfo)
 
-# docker: https://download.docker.com/linux/static/stable/x86_64/docker-18.06.3-ce.tgz
-tar -xzf docker/docker-18.06.3-ce.tgz
+# docker: https://download.docker.com/linux/static/stable/x86_64/docker-19.03.5.tgz
+tar -xzf docker/docker-19.03.5.tgz
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
 cp docker/* ${BOSH_INSTALL_TARGET}/bin
 
-# git: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.20.1.tar.gz
-tar -xzf docker/git-2.20.1.tar.gz
-pushd git-2.20.1 >/dev/null 2>&1
+# git: https://mirrors.edge.kernel.org/pub/software/scm/git/git-2.25.0.tar.gz
+tar -xzf docker/git-2.25.0.tar.gz
+pushd git-2.25.0 >/dev/null 2>&1
 ./configure --prefix=${BOSH_INSTALL_TARGET}
 make -j$CPUS all
 make install
