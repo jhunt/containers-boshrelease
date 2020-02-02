@@ -1,0 +1,56 @@
+#!/bin/bash
+<% if !p('recipe', {}).empty? %>
+set -eu
+
+BIN=post-start
+
+RUN_DIR=/var/vcap/sys/run/docker
+LOG_DIR=/var/vcap/sys/log/docker
+DAT_DIR=/var/vcap/store/docker
+JOB_DIR=/var/vcap/jobs/docker
+PIDFILE=${RUN_DIR}/compose.pid
+
+export PATH="$PATH:/var/vcap/packages/docker/bin"
+export DOCKER_HOST='unix:///var/vcap/sys/run/docker/docker.sock'
+
+echo "[$(date)] $BIN/$$: starting up..."
+echo "[$(date)] $BIN/$$: waiting for docker to become available..."
+n=300; ok=no
+while test $n -gt 0; do
+  if docker ps >/dev/null; then
+    ok=yes
+    break
+  fi
+  n=$(( n - 1 ))
+  sleep 0.1
+done
+
+if [[ $ok == "no" ]]; then
+  echo "[$(date)] $BIN/$$: docker (at $DOCKER_HOST) did not become available within 30s; bailing out."
+  exit 1
+fi
+
+echo "[$(date)] $BIN/$$: docker is up!"
+
+(shopt -s nullglob
+ for lst in /var/vcap/jobs/*/docker-bosh-release-import/*.lst; do
+   echo "[$(date)] $BIN/$$: loading images from $lst..."
+   for image in $(cat $lst); do
+     echo "[$(date)] $BIN/$$: loading $image into docker..."
+     docker load <$image
+     echo "[$(date)] $BIN/$$: loaded"
+   done
+ done)
+echo "[$(date)] $BIN/$$: docker images:"
+docker images
+
+echo "[$(date)] $BIN/$$: extracting files..."
+ttar < $JOB_DIR/etc/files.ttar
+cd $JOB_DIR/etc/running
+
+echo "[$(date)] $BIN/$$: spinning up docker-compose recipe..."
+docker-compose up --remove-orphans -d
+
+echo "[$(date)] $BIN/$$: startup complete"
+<% end %>
+exit 0

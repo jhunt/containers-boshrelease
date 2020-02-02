@@ -3,11 +3,12 @@ name: docker
 
 templates:
   bin/docker:  bin/docker
-  bin/compose: bin/compose
   envrc:       envrc
 
   etc/files.ttar:                 etc/files.ttar
   etc/running/docker-compose.yml: etc/running/docker-compose.yml
+
+  bin/post-start: bin/post-start
 
 packages:
   - docker

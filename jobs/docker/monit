@@ -3,11 +3,3 @@ check process docker
   start program "/var/vcap/jobs/docker/bin/docker start"
   stop  program "/var/vcap/jobs/docker/bin/docker stop"
   group vcap
-
-<% if !p('recipe', {}).empty? %>
-check process compose
-  with pidfile /var/vcap/sys/run/docker/compose.pid
-  start program "/var/vcap/jobs/docker/bin/compose start"
-  stop  program "/var/vcap/jobs/docker/bin/compose stop"
-  group vcap
-<% end %>
