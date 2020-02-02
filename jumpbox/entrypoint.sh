@@ -22,12 +22,14 @@ shell)
             -s ${JUMPBOX_USER_SHELL:-/bin/sh} ${JUMPBOX_USER_USERNAME}
 
     who=${JUMPBOX_USER_USERNAME}
+    export HOME=${JUMPBOX_USER_HOME}
     unset JUMPBOX_USER_USERNAME \
           JUMPBOX_USER_HOME \
           JUMPBOX_USER_SHELL \
           JUMPBOX_USER_UID \
           JUMPBOX_USER_GID
 
+    cd $HOME
     exec su --preserve-environment - $who
     exit 1
   fi
