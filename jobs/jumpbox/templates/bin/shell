@@ -8,8 +8,27 @@ HOMES="<%= p('homes') %>"
 case $USER in
 <% p('users').each do |user| %>
 <%= user['username'] %>)
+  user_home=<%= user['home'] || p('default.home').gsub('(username)', user['username']) %>
+  user_uid=$(getent passwd <%= user['username'] %> | awk -F: '{print $3}')
+  user_gid=$(getent passwd <%= user['username'] %> | awk -F: '{print $4}')
+
+  DOCKER_OPTS="-h <%= p('hostname') %>"
+  DOCKER_OPTS="$DOCKER_OPTS --mount type=tmpfs,destination=/tmp"
+  if [[ -n "${SSH_AUTH_SOCK:-}" && -e $SSH_AUTH_SOCK ]]; then
+    DOCKER_OPTS="$DOCKER_OPTS -v $SSH_AUTH_SOCK:/tmp/ssh.auth -e SSH_AUTH_SOCK=/tmp/ssh.auth"
+  fi
+  # mount in home
+  DOCKER_OPTS="$DOCKER_OPTS -v $HOMES/$USER:$user_home"
+
+  # set environment variables so that the jumpbox image can
+  # set up an internal account run as jumpbox user
+  DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_USERNAME=<%= user['username'] %>"
+  DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_HOME=$user_home"
+  DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_UID=$user_uid -e JUMPBOX_USER_GID=$user_gid"
+  DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_SHELL=<%= user['shell'] || p('default.shell') %>"
+
   docker pull "<%= user['image'] || p('default.image') %>"
-  exec docker run -it --rm -v $HOMES/$USER:<%= user['home'] || p('default.home') %> "<%= user['image'] || p('default.image') %>"
+  exec docker run -it --rm $DOCKER_OPTS "<%= user['image'] || p('default.image') %>"
   exit 1
   ;;
 <% end %>

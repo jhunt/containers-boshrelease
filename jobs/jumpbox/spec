@@ -14,6 +14,10 @@ templates:
   bin/shell:     bin/shell
 
 properties:
+  hostname:
+    description: What hostname to set in each jumpbox container
+    default:     unnamed.jump.box.local
+
   users:
     description: |
       A list of local users, their SSH keys, and prefered images.
@@ -31,6 +35,8 @@ properties:
 
         home                      The path (in the container) to mount
                                   this users home directory into.
+
+        shell                     The login shell to use (in-container).
 
     example: |
       users:
@@ -52,6 +58,13 @@ properties:
       The default path (in the container) where the users persistent
       home directory will be mounted.  The string `(username)` will
       be replaced by the actual username for the account.
+
+  default.shell:
+    default:     /bin/bash
+    description: |
+      The default login shell to use (in the container) for accounts
+      that do not explicitly specify one.  This should probably exist
+      inside of whatever image you set for `default.image`.
 
   homes:
     default: /var/vcap/store/jumpbox/home

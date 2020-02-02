@@ -1,18 +1,18 @@
 FROM ubuntu:18.04
 MAINTAINER James Hunt <james@niftylogic.com>
 
-ARG bbr_version=1.5.1
-ARG bosh_version=6.0.0
-ARG cf_version=6.46.0
-ARG credhub_version=2.5.2
-ARG fly_version=5.4.1
+ARG bbr_version=1.6.0
+ARG bosh_version=6.2.0
+ARG cf_version=6.49.0
+ARG credhub_version=2.6.2
+ARG fly_version=5.8.0
 ARG genesis_version=2.6.17
 ARG jq_version=1.6
-ARG kubectl_version=1.15.2
-ARG safe_version=1.3.0
-ARG spruce_version=1.22.0
-ARG terraform_version=0.12.6
-ARG vault_version=1.2.1
+ARG kubectl_version=1.17.2
+ARG safe_version=1.5.1
+ARG spruce_version=1.25.0
+ARG terraform_version=0.12.20
+ARG vault_version=1.3.2
 
 RUN apt-get update \
  && apt-get install -y \
@@ -102,3 +102,7 @@ RUN apt-get update \
  &&   /usr/bin/vault -v \
  \
  && echo "DONE"
+
+COPY /entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["shell"]
