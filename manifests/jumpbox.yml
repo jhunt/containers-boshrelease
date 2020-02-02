@@ -33,5 +33,4 @@ instance_groups:
         properties:
           users:
             - username: jhunt
-              key:      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKF3JPSfD1e92ryLKxYlSlXtDmbUUe0EOalBAJvthCmK jhunt@hydra.local
-              home:     /root
+              key:      ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKF3JPSfD1e92ryLKxYlSlXtDmbUUe0EOalBAJvthCmK
