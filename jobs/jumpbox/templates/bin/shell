@@ -4,6 +4,7 @@ set -eu
 export PATH="$PATH:/var/vcap/packages/docker/bin"
 export DOCKER_HOST='unix:///var/vcap/sys/run/docker/docker.sock'
 
+VOLROOT=/var/vcap/store/jumpbox/volumes
 HOMES="<%= p('homes') %>"
 case $USER in
 <% p('users').each do |user| %>
@@ -26,6 +27,25 @@ case $USER in
   DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_HOME=$user_home"
   DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_UID=$user_uid -e JUMPBOX_USER_GID=$user_gid"
   DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_SHELL=<%= user['shell'] || p('default.shell') %>"
+
+  # set up mountpoints
+  <% for mount in (user['mounts'] || ['defaults']).map { |item|
+                      item == "defaults" ?  p('default.mounts', []) : item
+                    }.flatten
+       m = { "destination" => mount['mountpoint'] }
+       if mount['tmpfs']
+         m["type"] = "tmpfs"
+       elsif mount['volume']
+         m["type"] = "bind"
+         m["source"] = "$VOLROOT/#{mount['volume']}"
+       elsif mount['filesystem']
+         m["type"] = "bind"
+         m["source"] = mount['filesystem']
+       else
+         raise "Filesystem #{mount.inspect} has no `volume', `filesystem', or `tmpfs' key!"
+       end
+  %>DOCKER_OPTS="$DOCKER_OPTS --mount <%= m.map { |k,v| "#{k}=#{v}" }.join(",") %>"
+  <% end %>
 
   docker pull "<%= user['image'] || p('default.image') %>"
   exec docker run -it --rm $DOCKER_OPTS "<%= user['image'] || p('default.image') %>"

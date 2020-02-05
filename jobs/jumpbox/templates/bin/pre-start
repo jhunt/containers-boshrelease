@@ -2,9 +2,12 @@
 set -eu
 exec 2>&1
 
+VOLROOT=/var/vcap/store/jumpbox/volumes
+mkdir -p $VOLROOT
 HOMES="<%= p('homes') %>"
 mkdir -p $HOMES
 
+echo "[$(date)] pre-start/$$: setting up jumpbox users..."
 <% p('users').each do |user|
 
   username = user['username'] || ''
@@ -32,7 +35,7 @@ mkdir -p $HOMES
     raise "User '#{username}' has no home directory specified, and default.home is not set."
   end
 %>
-echo "[$(date)] pre-start/$$: setting up <%= username %>..."
+echo "[$(date)] pre-start/$$: setting up user <%= username %>..."
 getent group <%= group %> > /dev/null || (set -x; groupadd <%= group %>)
 getent passwd <%= username %> > /dev/null || (set -x; useradd --no-user-group -g <%= group %> --create-home <%= username %> --base-dir $HOMES)
 (set -x
@@ -49,6 +52,26 @@ cat > ~<%= username %>/.ssh/authorized_keys <<EOF
 EOF
 chown -R <%= username %>: $HOMES/<%= username %>)
 
-echo "[$(date)] pre-start/$$: finished setting up <%= username %>..."
+echo "[$(date)] pre-start/$$: finished setting up user <%= username %>..."
+<% end %>
+
+echo "[$(date)] pre-start/$$: setting up jumpbox volumes (in $VOLROOT)..."
+<% p('volumes').each do |volume|
+
+  name  = volume['name']  || ''
+  user  = volume['user']  || 'root'
+  group = volume['group'] || 'root'
+  mode  = volume['mode']  || '0775'
+
+  if name.empty?
+    raise "The 'name' field of each volume entry is *required*."
+  end
+%>
+echo "[$(date)] pre-start/$$: setting up volume <%= name %>..."
+(set -x
+mkdir -p $VOLROOT/<%= name %>
+chown <%= user %>:<%= group %> $VOLROOT/<%= name %>
+chmod <%= mode %> $VOLROOT/<%= name %>)
+echo "[$(date)] pre-start/$$: finished setting up volume <%= name %>..."
 <% end %>
 echo "[$(date)] pre-start/$$: DONE"

@@ -43,6 +43,14 @@ properties:
                                   and if that is missing, the user is put
                                   in a group all by themselves.
 
+        mounts                    A list of volume mounts to mount into this
+                                  users jumpbox container.  Follows the same
+                                  format used by `default.mounts`.
+
+                                  Any entry in the list that consists solely
+                                  of the string `"defaults"` will be replaced
+                                  with the value of `default.mounts`, inline.
+
     example: |
       users:
         - username: jhunt
@@ -77,6 +85,32 @@ properties:
       not specified, then each user will be put in their own group,
       that contains them and only them.
 
+  default.mounts:
+    description: |
+      A list of volume mounts that all user jumpbox containers will get,
+      by default.  Each entry in the list specifies which volume or
+      filesystem path to bind-mount, the mountpoint in the container,
+      additional options, etc.
+
+      The full list of supported keys (per mount) is:
+
+        volume           The name of the volume (see `volumes`), or the
+        filesystem       path to the BOSH VM filesystem to use as the
+                         source of the mount.
+
+        tmpfs            A boolean.  If true, the `volume` and `filesystem`
+                         values will be ignored and a tmpfs mount will
+                         be created instead.
+
+        mountpoint       The path (inside the container) to mount the
+                         source volume / filesystem at.
+
+        options          A string to be passed to the underlying Docker
+                         CLI for additional options for the mount.
+                         These will be passed as-is to the `--mount`
+                         command, with the `type`, `source`, and
+                         `destination` keys already set.
+
   homes:
     default: /var/vcap/store/jumpbox/home
     description: |
@@ -88,3 +122,30 @@ properties:
       but if you need to move it, you can.  Note that BOSH will always
       have a `store` directory, even if you don't provision a persistent
       disk to mount it on.
+
+  volumes:
+    default: []
+    description: |
+      A list of volumes to define on-disk, and make available to be
+      bind-mounted into jumpbox containers on a per-user basis, or
+      globally (via `default.mounts`).
+
+      The full list of supported keys (per volume) is:
+
+        name           (required) The name of the volume.  From this,
+                                  the path on persistent storage will
+                                  be derived.
+
+        user                      The username of the account that owns
+                                  the underlying volume directory.
+                                  Defaults to 'root' (uid 0).
+
+        group                     The name of the group that owns the
+                                  underlying volume directory.
+                                  Defaults to 'root' (gid 0).
+
+        mode                      The permissions, in octal, to set on
+                                  the underlying volume directory.
+                                  Defaults to '0775'.  Don't forget to
+                                  quote this to avoid YAML interpreting
+                                  it as a number.

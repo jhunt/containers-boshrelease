@@ -30,3 +30,7 @@ variety of different scenarios:
    jumpbox with several people in a handful of different teams.
    People on the same team will be able to share files (or at
    least their group memberships allow it.)
+
+ - [manifest/jumpbox-volumes.yml](manifests/jumpbox-volumes.yml) -
+   A jumpbox with a shared volume, a read-only filesystem mount,
+   and a tmpfs-backed scratch space, to show off volume support.
