@@ -1,5 +1,6 @@
 #!/bin/bash
 set -eu
+exec 2>&1
 
 HOMES="<%= p('homes') %>"
 mkdir -p $HOMES
@@ -9,6 +10,7 @@ mkdir -p $HOMES
   username = user['username'] || ''
   image    = user['image']    || p('default.image')
   home     = user['home']     || p('default.home')
+  group    = user['group']    || p('default.group', username)
 
   if username.empty?
     raise "The 'username' field of each user entry is *required*."
@@ -31,7 +33,9 @@ mkdir -p $HOMES
   end
 %>
 echo "[$(date)] pre-start/$$: setting up <%= username %>..."
-getent passwd <%= username %> > /dev/null || useradd --create-home <%= username %> --base-dir $HOMES
+getent group <%= group %> > /dev/null || (set -x; groupadd <%= group %>)
+getent passwd <%= username %> > /dev/null || (set -x; useradd --no-user-group -g <%= group %> --create-home <%= username %> --base-dir $HOMES)
+(set -x
 passwd -d <%= username %>
 usermod -s /var/vcap/jobs/jumpbox/bin/shell <%= username %>
 usermod -G vcap,bosh_sshers <%= username %>
@@ -43,6 +47,8 @@ chmod 0600 ~<%= username %>/.ssh/authorized_keys
 cat > ~<%= username %>/.ssh/authorized_keys <<EOF
 <%= [keys].flatten.join("\n") %>
 EOF
-chown -R <%= username %>: $HOMES/<%= username %>
+chown -R <%= username %>: $HOMES/<%= username %>)
 
+echo "[$(date)] pre-start/$$: finished setting up <%= username %>..."
 <% end %>
+echo "[$(date)] pre-start/$$: DONE"

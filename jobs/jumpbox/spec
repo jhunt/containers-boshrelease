@@ -38,6 +38,11 @@ properties:
 
         shell                     The login shell to use (in-container).
 
+        group                     The name of the user's primary group
+                                  (on the VM).  Defaults to `default.group`,
+                                  and if that is missing, the user is put
+                                  in a group all by themselves.
+
     example: |
       users:
         - username: jhunt
@@ -65,6 +70,12 @@ properties:
       The default login shell to use (in the container) for accounts
       that do not explicitly specify one.  This should probably exist
       inside of whatever image you set for `default.image`.
+
+  default.group:
+    description: |
+      A default shared group to put all jumpbox users in.  If this is
+      not specified, then each user will be put in their own group,
+      that contains them and only them.
 
   homes:
     default: /var/vcap/store/jumpbox/home

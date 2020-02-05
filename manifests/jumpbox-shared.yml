@@ -31,6 +31,11 @@ instance_groups:
       - name: jumpbox
         release: containers
         properties:
+          default:
+            group: staff
           users:
-            - username: jhunt
+            - username: alice
+              key:      ssh-ed25519 AAAA....etc....
+
+            - username: bob
               key:      ssh-ed25519 AAAA....etc....
