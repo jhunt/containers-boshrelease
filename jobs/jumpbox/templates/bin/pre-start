@@ -44,6 +44,8 @@ usermod -s /var/vcap/jobs/jumpbox/bin/shell <%= username %>
 usermod -G vcap,bosh_sshers <%= username %>
 
 chmod 0700 ~<%= username %>
+# undo the BOSH PS1 source
+sed -i -e '/^source \/etc\/profile\.d\/00-bosh-ps1$/d' ~<%= username %>/.bashrc
 mkdir -p ~<%= username %>/.ssh
 touch ~<%= username %>/.ssh/authorized_keys
 chmod 0600 ~<%= username %>/.ssh/authorized_keys
