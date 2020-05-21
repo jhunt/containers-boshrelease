@@ -1,12 +1,12 @@
-docker/docker-19.03.5.tgz:
-  size: 63252595
-  object_id: 8693e197-bbba-45b7-55fa-d5d1ce19022b
-  sha: sha256:50cdf38749642ec43d6ac50f4a3f1f7f6ac688e8d8b4e1c5b7be06e1a82f06e9
+docker/docker-19.03.9.tgz:
+  size: 60730088
+  object_id: 2dac60c3-ec4e-4ea2-45f7-9807fa429b90
+  sha: sha256:1c03c78be198d9085e7dd6806fc5d93264baaf0c7ea17f584d00af48eae508ee
 docker/docker-compose:
-  size: 16350840
-  object_id: 84838191-4189-430f-4952-55fb5caa38e9
-  sha: 043fec968aab2059f48958ef037e7b983e03863d
-docker/git-2.25.0.tar.gz:
-  size: 9023390
-  object_id: aa13f497-6709-4652-6894-a56818e9fcc9
-  sha: sha256:a98c9b96d91544b130f13bf846ff080dda2867e77fe08700b793ab14ba5346f6
+  size: 17586312
+  object_id: 24adaa2c-186b-45b1-6e76-67a8906f449b
+  sha: sha256:1cb7ecccc17c8d5f1888f9e2b3211b07e35c86d0010a6c0f711fe65ef5b69528
+docker/git-2.26.2.tar.gz:
+  size: 9282064
+  object_id: fc71839b-914d-4dd6-7e5f-702762a1030f
+  sha: sha256:e1c17777528f55696815ef33587b1d20f5eec246669f3b839d15dbfffad9c121
