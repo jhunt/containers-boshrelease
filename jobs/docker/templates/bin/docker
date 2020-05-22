@@ -6,12 +6,12 @@ BIN=docker
 SIGTERM_FOR=15
 SIGKILL_FOR=5
 
-RUN_DIR=/var/vcap/sys/run/docker
-LOG_DIR=/var/vcap/sys/log/docker
-JOB_DIR=/var/vcap/jobs/docker
-DAT_DIR=/var/vcap/store/docker
-PIDFILE=${RUN_DIR}/docker.pid
-exec >>$LOG_DIR/docker.log 2>&1
+RUN_DIR=/var/vcap/sys/run/$JOB
+LOG_DIR=/var/vcap/sys/log/$JOB
+JOB_DIR=/var/vcap/jobs/$JOB
+DAT_DIR=/var/vcap/store/$JOB
+PIDFILE=${RUN_DIR}/$JOB.pid
+exec >>$LOG_DIR/$BIN.log 2>&1
 
 CGROUPS_ROOT=/sys/fs/cgroup
 if grep -q warden /var/vcap/bosh/etc/infrastructure; then

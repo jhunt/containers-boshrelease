@@ -2,13 +2,14 @@
 <% if !p('recipe', {}).empty? %>
 set -eu
 
+JOB=docker
 BIN=post-start
 
-RUN_DIR=/var/vcap/sys/run/docker
-LOG_DIR=/var/vcap/sys/log/docker
-DAT_DIR=/var/vcap/store/docker
-JOB_DIR=/var/vcap/jobs/docker
-PIDFILE=${RUN_DIR}/compose.pid
+RUN_DIR=/var/vcap/sys/run/$JOB
+LOG_DIR=/var/vcap/sys/log/$JOB
+DAT_DIR=/var/vcap/store/$JOB
+JOB_DIR=/var/vcap/jobs/$JOB
+exec >>$LOG_DIR/$BIN.log 2>&1
 
 export PATH="$PATH:/var/vcap/packages/docker/bin"
 export DOCKER_HOST='unix:///var/vcap/sys/run/docker/docker.sock'
