@@ -1,0 +1,42 @@
+---
+name: nginx
+stemcells:
+  - alias:   default
+    os:      ubuntu-xenial
+    version: latest
+
+releases:
+  - name:    containers
+    version: latest
+
+update:
+  canaries:          1
+  max_in_flight:     1
+  serial:            true
+  canary_watch_time: 1000-120000
+  update_watch_time: 1000-120000
+
+instance_groups:
+  - name:      docker
+    instances: 1 
+    azs:       [z1]
+    vm_type:   default
+    stemcell:  default
+    networks:  [{name: default}]
+
+    jobs:
+      - name: docker
+        release: containers
+        properties:
+          files:
+            html/index.html: |
+              hello, from nginx!
+
+          recipe:
+            version: '3'
+            services:
+              nginx:
+                image: nginx
+                ports: ['80:80']
+                volumes:
+                  - "$PWD/html:/usr/share/nginx/html:ro"
