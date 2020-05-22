@@ -1,1 +1,1 @@
-<%= p('recipe', {}).to_yaml.to_s %>
+<% r = p('recipe', {}) %><% if r.is_a? String %><%= r %><% else %><%= r.to_yaml.to_s %><% end %>
