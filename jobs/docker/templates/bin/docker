@@ -55,7 +55,7 @@ case $1 in
     <% if !p('recipe', {}).empty? %>
     pushd $JOB_DIR/etc/running >/dev/null 2>&1
     echo "[$(date)] $BIN/$$: shutting down docker-compose'd containers..."
-    docker-compose down
+    docker-compose down || true # borked compose recipes may fail to down...
     <% else %>
     echo "[$(date)] $BIN/$$: no docker-compose recipe detected; nothing to shut down..."
     <% end %>
