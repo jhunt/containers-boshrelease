@@ -1,0 +1,143 @@
+---
+name: postgres
+stemcells:
+  - alias:   default
+    os:      ubuntu-xenial
+    version: latest
+
+releases:
+  - name:    containers
+    version: latest
+
+update:
+  canaries:          1
+  max_in_flight:     1
+  serial:            true
+  canary_watch_time: 1000-120000
+  update_watch_time: 1000-120000
+
+instance_groups:
+  - name:      docker
+    instances: 1 
+    azs:       [z1]
+    vm_type:   default
+    stemcell:  default
+    networks:  [{name: default}]
+
+    jobs:
+      - name: docker
+        release: containers
+        properties:
+          files:
+            etc/postgresql.conf: |
+              listen_addresses = '*'
+              ssl = on
+            etc/pg_hba.conf: |
+              # TYPE     DB   USER  ADDRESS       METHOD
+              local      all  all                 trust
+              host       all  all   127.0.0.1/32  trust
+              hostssl    all  all   0.0.0.0/0     md5
+              hostnossl  all  all   0.0.0.0/0     reject
+
+            tls/server.crt: |
+              -----BEGIN CERTIFICATE-----
+              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
+              -----END CERTIFICATE-----
+
+            tls/server.key: |
+              -----BEGIN RSA PRIVATE KEY-----
+              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
+              -----END RSA PRIVATE KEY-----
+
+          prep: |
+            #!/bin/sh
+            chmod 0600 tls/server.key
+
+          recipe:
+            version: '3'
+            services:
+              db:
+                image: postgres
+                ports: ['5432:5432']
+                environment:
+                  - POSTGRES_PASSWORD=foo
+                volumes:
+                  - "/var/vcap/store/postgres/db:/var/lib/postgresql/data"
+                  - "$PWD/tls/server.crt:/var/lib/postgresql/data/server.crt"
+                  - "$PWD/tls/server.key:/var/lib/postgresql/data/server.key"
+                  - "$PWD/etc/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf"
+                  - "$PWD/etc/postgresql.conf:/var/lib/postgresql/data/postgresql.conf"
