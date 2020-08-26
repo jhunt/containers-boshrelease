@@ -49,6 +49,10 @@ echo "[$(date)] $BIN/$$: extracting files..."
 ttar < $JOB_DIR/etc/files.ttar
 cd $JOB_DIR/etc/running
 
+echo "[$(date)] $BIN/$$: running 'prep' script..."
+chmod 0755 $JOB_DIR/bin/prep
+$JOB_DIR/bin/prep
+
 echo "[$(date)] $BIN/$$: spinning up docker-compose recipe..."
 docker-compose up --remove-orphans -d
 

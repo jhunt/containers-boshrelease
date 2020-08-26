@@ -9,6 +9,7 @@ templates:
   etc/running/docker-compose.yml: etc/running/docker-compose.yml
 
   bin/post-start: bin/post-start
+  bin/prep:       bin/prep
 
 packages:
   - docker
@@ -38,6 +39,24 @@ properties:
     description: |
       A map, keyed by relative file path, of additional files to create
       and use in bind mounts of the docker-compose recipe.
+
+  prep:
+    description: |
+      Sometimes, we don't pick our Docker images -- they pick us.
+      Oftentimes that means that we must conform to their view of the
+      world regarding things like file ownership, permissions, etc.
+
+      This spec lets you write the entirety of an executable script
+      (in whatever scripting language you want) to execute outside of
+      the containers (on the BOSH VM) before attempting to spin up
+      the docker-compose recipe.  Use this to chown and chmod to your
+      hearts content.
+
+      This script really ought to be fully idempotent, as it will be
+      run **every** time the job is restarted, i.e. on stemcell update.
+    default: |
+      #!/bin/sh
+      exit 0
 
   insecure-registries:
     default: []
