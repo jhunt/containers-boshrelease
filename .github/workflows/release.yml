@@ -1,0 +1,14 @@
+---
+on: 
+  push:
+    branch: testing
+
+jobs:
+  hello_world_job:
+    runs-on: ubuntu-latest
+    name: Create BOSH Release
+    steps:
+    - name: bosh create-release
+      uses: jhunt/bosh-create-release
+      with:
+        version: 1.2.3
