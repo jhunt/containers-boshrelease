@@ -28,8 +28,12 @@ jobs:
         id:   bosh
         uses: jhunt/bosh-create-release@v1
         with:
+          name:    containers
           version: ${{ steps.version.outputs.replaced }}
           tarball: containers-${{ steps.version.outputs.replaced }}.tgz
+
+          s3-access-key-id:     ${{ secrets.CFC_S3_AKI }}
+          s3-secret-access-key: ${{ secrets.CFC_S3_KEY }}
 
 
       - name: git commit
