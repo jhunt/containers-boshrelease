@@ -1,0 +1,69 @@
+---
+on: 
+  push:
+    tags: [ 'rc*' ]
+
+jobs:
+  release:
+    name: Cut a Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+
+      - name: get version
+        id:   version
+        uses: frabert/replace-string-action@v1.1
+        with:
+          pattern:      '^refs.tags.rc'
+          string:       ${{ github.ref }}
+          replace-with: ''
+
+
+      - name: bosh create-release
+        id:   bosh
+        uses: jhunt/bosh-create-release@v1
+        with:
+          version: ${{ steps.version.outputs.replaced }}
+          tarball: containers-${{ steps.version.outputs.replaced }}.tgz
+
+
+      - name: git commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        with:
+          branch:          master
+          commit_message:  Release v${{ steps.version.outputs.replaced }}
+          tagging_message: v${{ steps.version.outputs.replaced }}
+
+
+      - name: github release
+        id:   release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        with:
+          tag_name:     v${{ steps.version.outputs.replaced }}
+          release_name: Containers BOSH Release v${{ steps.version.outputs.replaced }}
+          draft:        false
+          prerelease:   false
+          body: |
+            _one of the core devs really ought to update these release notes..._
+
+
+      - name: upload bosh release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: containers-${{ steps.version.outputs.replaced }}.tgz
+          asset_name: containers-${{ steps.version.outputs.replaced }}.tgz
+          asset_content_type: application/octet-stream
