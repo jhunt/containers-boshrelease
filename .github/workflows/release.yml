@@ -1,19 +1,65 @@
 ---
 on: 
   push:
-    branch: testing
+    tags: [ 'rc*' ]
 
 jobs:
-  create_release:
+  release:
+    name: Cut a Release
     runs-on: ubuntu-latest
-    name: Create BOSH Release
 
     steps:
-    - name: git checkout
-      uses: actions/checkout@v2
+      - name: git checkout
+        uses: actions/checkout@v2
 
-    - name: bosh create-release
-      id:   release
-      uses: jhunt/bosh-create-release@v1
-      with:
-        version: 1.2.3
+
+      - name: get version
+        id:   version
+        uses: frabert/replace-string-action@v1.1
+        with:
+          pattern:      '^refs.tags.build.*'
+          string:       ${{ github.ref }}
+          replace-with: '1.2.3'
+
+
+      - name: bosh create-release
+        id:   bosh
+        uses: jhunt/bosh-create-release@v1
+        with:
+          version: ${{ steps.version.outputs.replaced }}
+
+
+      - name: github release
+        id:   release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        with:
+          tag_name:     ${{ github.ref }}
+          release_name: Blacksmith ${{ github.ref }}
+          draft:        false
+          prerelease:   false
+          body: |
+            _one of the core devs really ought to update these release notes..._
+
+
+      - name: upload bosh release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: ${{ steps.bosh.outputs.tarball }}
+          asset_name: containers-${{ steps.version.outputs.replaced }}.tgz
+          asset_content_type: application/octet-stream
+
+
+      - name: git commit
+        uses: EndBug/add-and-commit@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        with:
+          message: Release v${{ steps.version.outputs.replaced }}
+          tag:     v${{ steps.version.outputs.replaced }}
