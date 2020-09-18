@@ -4,7 +4,7 @@ on:
     branch: testing
 
 jobs:
-  hello_world_job:
+  create_release:
     runs-on: ubuntu-latest
     name: Create BOSH Release
     steps:
