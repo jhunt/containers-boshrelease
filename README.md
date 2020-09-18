@@ -1,3 +1,5 @@
+![Build](https://github.com/jhunt/containers-boshrelease/workflows/.github/workflows/test.yml/badge.svg)
+
 Containers BOSH Release
 =======================
 
