@@ -9,8 +9,8 @@ jobs:
     name: Create BOSH Release
 
     steps:
-    - name:  git checkout
-      users: actions/checkout
+    - name: git checkout
+      uses: actions/checkout
 
     - name: bosh create-release
       id:   release
