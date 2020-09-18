@@ -3,8 +3,8 @@ set -eu
 
 CPUS=$(grep -c ^processor /proc/cpuinfo)
 
-# docker: https://download.docker.com/linux/static/stable/x86_64/docker-19.03.12.tgz
-tar -xzf docker/docker-19.03.12.tgz
+# docker: https://download.docker.com/linux/static/stable/x86_64/docker-19.03.13.tgz
+tar -xzf docker/docker-19.03.13.tgz
 mkdir -p ${BOSH_INSTALL_TARGET}/bin
 cp docker/* ${BOSH_INSTALL_TARGET}/bin
 
