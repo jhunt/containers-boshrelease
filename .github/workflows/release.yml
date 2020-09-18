@@ -9,6 +9,7 @@ jobs:
     name: Create BOSH Release
     steps:
     - name: bosh create-release
+      id:   release
       uses: jhunt/bosh-create-release@v1
       with:
         version: 1.2.3
