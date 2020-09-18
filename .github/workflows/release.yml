@@ -10,7 +10,7 @@ jobs:
 
     steps:
     - name: git checkout
-      uses: actions/checkout
+      uses: actions/checkout@v2
 
     - name: bosh create-release
       id:   release
