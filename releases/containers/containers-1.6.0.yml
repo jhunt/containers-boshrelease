@@ -1,0 +1,26 @@
+name: containers
+version: 1.6.0
+commit_hash: 7345d1d
+uncommitted_changes: false
+jobs:
+- name: docker
+  version: 1ad1462434e2fc221960a74f742bbc674d94eb319d17d591ac8659e7febfa93f
+  fingerprint: 1ad1462434e2fc221960a74f742bbc674d94eb319d17d591ac8659e7febfa93f
+  sha1: sha256:d640d108d22ff77431e90b5488b45e33ca4fbd8a28c175ee58e7b56882f93b8b
+  packages:
+  - docker
+- name: jumpbox
+  version: 49e55fea4a519ea1778abc4c8a62a7bc5b85a83de8112f369ab0f2f64a7d0415
+  fingerprint: 49e55fea4a519ea1778abc4c8a62a7bc5b85a83de8112f369ab0f2f64a7d0415
+  sha1: sha256:9f6a768d776562249b120ff214eb30abfd079749b7b7633b17c289bac7add6da
+  packages: []
+packages:
+- name: docker
+  version: d1c4e2146a8cdbc436022ec26bf314b7241bb421fc384bfa6ddea17f667d52e6
+  fingerprint: d1c4e2146a8cdbc436022ec26bf314b7241bb421fc384bfa6ddea17f667d52e6
+  sha1: sha256:6a82a5b5ccb1c027be5bd28f23187382a738595c646276a2f541b8b603093de2
+  dependencies: []
+license:
+  version: c027ecdf0016e6f072c390230a50ce11be821c47c72536d9c66a1dd3b882640b
+  fingerprint: c027ecdf0016e6f072c390230a50ce11be821c47c72536d9c66a1dd3b882640b
+  sha1: sha256:5a4e8d4b7f056f2f8122570c7557193db4fc817aa0d581302b7ffd2f659f4b3a
