@@ -12,4 +12,8 @@ releases/**/*.tgz
 *~
 *#
 #*
-*.tgz
+
+# downloaded packages
+/docker-*.tgz
+/git-*.tar.gz
+/docker-compose
