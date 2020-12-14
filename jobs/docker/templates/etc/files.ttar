@@ -1,3 +1,31 @@
-<% p('files', {}).each do |name, contents| %>====== 0644 /var/vcap/jobs/docker/etc/running/<%= name %>
+<%
+  files = p('files', {})
+
+  if files.is_a?(Array) then
+
+    mapped = {} # the final, merged map
+    from   = {} # tracks which array set first defined a file
+
+    override = p('on_duplicate_files', 'raise-error') == 'override'
+
+    files.each_with_index do |set, i|
+      set.each do |name, contents|
+
+        if !override
+          if from.has_key?(name) then
+            raise "file '#{name}' re-defined! (first definition was in array set ##{from[name]})"
+          end
+          from[name] = i+1
+        end
+
+        mapped[name] = contents
+
+      end
+    end
+
+    files = mapped
+  end
+
+  files.each do |name, contents| %>====== 0644 /var/vcap/jobs/docker/etc/running/<%= name %>
 <%= contents.is_a?(String) ? contents : contents.to_yaml %>
 <% end %>

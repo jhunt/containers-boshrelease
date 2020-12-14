@@ -40,6 +40,25 @@ properties:
       A map, keyed by relative file path, of additional files to create
       and use in bind mounts of the docker-compose recipe.
 
+      If you've made life decisions that have led you down the path of
+      go-patch operator files, you'll be pleased to know that we are
+      particularly charitable.  You can specify this as an array of
+      maps, which will each be merged in-line during template render.
+      This is easier to do with Spruce and tools like it, but sometimes
+      you're stuck with the decisions of the past.
+
+  on_duplicate_files:
+    default: raise-error
+    description: |
+      If using the array form of the `files` directive, you may end up
+      (quite easily, actually) with duplicated, conflicting file names.
+      If this happens, the default behavior of this release is to raise
+      an error and halt deployment. (`on_duplicate_files: raise-error`)
+
+      If you would rather recklessly merge in operator files, and override
+      the earlier file contents with the later ones, set this to its
+      other valid value: 'override'.
+
   prep:
     description: |
       Sometimes, we don't pick our Docker images -- they pick us.
