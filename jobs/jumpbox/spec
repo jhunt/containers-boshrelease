@@ -43,6 +43,10 @@ properties:
                                   and if that is missing, the user is put
                                   in a group all by themselves.
 
+        env                       A map of environment variable names,. to
+                                  their values.  The user's container will
+                                  always have those set.
+
         mounts                    A list of volume mounts to mount into this
                                   users jumpbox container.  Follows the same
                                   format used by `default.mounts`.
@@ -84,6 +88,27 @@ properties:
       A default shared group to put all jumpbox users in.  If this is
       not specified, then each user will be put in their own group,
       that contains them and only them.
+
+  merge_environments:
+    default: true
+    description: |
+      Whether or not to use the `default.env` set of environment
+      variables as a basis, with per-user overrides.  If set to false,
+      then `default.env` will be wholly ignored if the `env` key is
+      set for a particular user.
+
+  default.env:
+    description: |
+      A map of environment variables to their values, for all users.
+
+      If the `merge_environments` directive is set to true, this list
+      will be used as a base, and each specified environment variable
+      can be set at a per-user level, to oeverride.  This is the
+      default behavior.
+
+      If `merge_environments` is set to false, however, the user set of
+      environment variables will take precedence (if given), and none
+      of these defaults will be used.
 
   default.mounts:
     description: |

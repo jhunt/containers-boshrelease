@@ -21,6 +21,29 @@ case $USER in
   # mount in home
   DOCKER_OPTS="$DOCKER_OPTS -v $HOMES/$USER:$user_home"
 
+  # set up any custom per-user, or default environment variables
+  envfile=$HOMES/$USER/.containers-boshrelease-docker-env
+  cat > $envfile <<EOF
+<%
+    env = p('default.env', {})
+    merge = p('merge_environments', true)
+
+    if (user['env'] || {}).keys.length > 0 then
+      if !merge then
+        env = user['env']
+      else
+        user['env'].each do |key, value|
+          env[key] = value.to_s
+        end
+      end
+    end
+
+     env.each do |var, value| -%>
+<%= var %>=<%= value %>
+<% end -%>
+EOF
+  DOCKER_OPTS="$DOCKER_OPTS --env-file $envfile"
+
   # set environment variables so that the jumpbox image can
   # set up an internal account run as jumpbox user
   DOCKER_OPTS="$DOCKER_OPTS -e JUMPBOX_USER_USERNAME=<%= user['username'] %>"
