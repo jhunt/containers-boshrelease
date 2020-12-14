@@ -17,3 +17,6 @@ releases/**/*.tgz
 /docker-*.tgz
 /git-*.tar.gz
 /docker-compose
+
+# generated release assets
+/containers-*.tgz
