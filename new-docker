@@ -1,0 +1,24 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+my $have = $ARGV[0] || 'none';
+my $url = "https://download.docker.com/linux/static/stable/x86_64";
+open my $fh, "-|", "curl -sL $url"
+	or die "unable to curl: $!\n";
+
+my $v = 0;
+my $last = undef;
+while (<$fh>) {
+	next unless m/href="(docker-(\d+)\.(\d+)\.(\d+)\.tgz)"/;
+	my ($f, $x, $y, $z) = ($1, $2, $3, $4);
+	my $n = $x * 10**6 + $y * 10**3 + $z;
+	if ($n > $v) {
+		$v = $n;
+		$last = ["$x.$y.$z", $f];
+	}
+}
+close($fh);
+
+$last or die "no latest version detected!";
+$last->[0] eq $have or print "$url/$last->[1]\n";

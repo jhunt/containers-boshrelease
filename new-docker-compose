@@ -1,0 +1,10 @@
+#!/bin/bash
+set -e
+
+id=$(  curl -sL https://api.github.com/repos/docker/compose/releases/latest | jq -r .id)
+tag=$( curl -sL https://api.github.com/repos/docker/compose/releases/$id    | jq -r .tag_name | sed -e 's/^v//')
+file=$(curl -sL https://api.github.com/repos/docker/compose/releases/$id    | jq -r '.assets[].browser_download_url' | grep 'docker-compose-Linux-x86_64$')
+
+if [[ $tag != "${1:-none}" ]]; then
+  echo $file
+fi

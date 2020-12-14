@@ -20,3 +20,8 @@ yaml-snippet:
 	@echo "    url:     https://github.com/jhunt/containers-boshrelease/releases/download/v$(VERSION)/containers-$(VERSION).tgz"
 	@echo "    sha1:    $(shell sha1sum releases/containers-$(VERSION).tgz | awk '{print $$1}')"
 	@echo
+
+latest:
+	./new-docker
+	./new-git
+	./new-docker-compose
