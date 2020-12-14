@@ -41,7 +41,7 @@ getent passwd <%= username %> > /dev/null || (set -x; useradd --no-user-group -g
 (set -x
 passwd -d <%= username %>
 usermod -s /var/vcap/jobs/jumpbox/bin/shell <%= username %>
-usermod -G vcap,bosh_sshers <%= username %>
+usermod -g <%= group %> -G vcap,bosh_sshers <%= username %>
 
 chmod 0700 ~<%= username %>
 # undo the BOSH PS1 source
